@@ -1,3 +1,6 @@
 package com.example.quizapp.data.model
 
-class Question : ArrayList<QuestionItem>()
+data class Question(
+    val response_code: Int,
+    val results: ArrayList<QuestionItem>
+)
