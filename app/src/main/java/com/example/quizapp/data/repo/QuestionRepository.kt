@@ -15,7 +15,7 @@ class QuestionRepository @Inject constructor(private val api: QuestionApi) {
     suspend fun getAllQuestions(): DataOrException<ArrayList<QuestionItem>, Boolean, Exception> {
         try {
             dataOrException.loading = true
-            dataOrException.data = api.getAllQuestions()
+            dataOrException.data = api.getAllQuestions(amount = "20", category = "31", difficulty = "easy")
             if (dataOrException.data.toString().isNotEmpty()) dataOrException.loading = false
 
         }catch (exception: Exception) {
