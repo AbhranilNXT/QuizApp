@@ -1,7 +1,5 @@
 package com.example.quizapp.vm
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quizapp.data.local.UiState
