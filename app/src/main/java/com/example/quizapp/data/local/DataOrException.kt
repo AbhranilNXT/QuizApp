@@ -1,7 +1,5 @@
 package com.example.quizapp.data.local
 
-import java.lang.Exception
-
 //Wrapper class
 sealed interface UiState<out T> {
 
