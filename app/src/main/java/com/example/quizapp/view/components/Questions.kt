@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -33,14 +34,15 @@ import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.quizapp.data.local.UiState
 import com.example.quizapp.data.model.Result
 import com.example.quizapp.vm.QuestionsViewModel
-import java.lang.Exception
 
 @Composable
 fun Questions(viewModel: QuestionsViewModel) {
@@ -68,22 +70,17 @@ fun Questions(viewModel: QuestionsViewModel) {
                 null
             }
 
+            val questionsCount = try {
+                question.data.results.size
+            } catch (e : Exception) {
+                null
+            }
+
             QuestionDisplay(question = questions!!,
-                questionIndex = questionIndex,
-                viewModel = viewModel) {
+                questionSize = questionsCount!!,
+                questionIndex = questionIndex) {
                 questionIndex.value += 1
             }
-//            if(question != null) {
-//            }
-//            Log.d("Success Value", question.data.results.toString())
-//            Log.d("size","${question.data.results.size}")
-//            question.data.results.forEach { questionItem ->
-//
-//                Log.d("resultqqqq", questionItem.question.toString()
-//                    .replace("&quot;","'")
-//                    .replace("&#039;","'")
-//                )
-//            }
         }
 
         else -> {
@@ -96,8 +93,8 @@ fun Questions(viewModel: QuestionsViewModel) {
 
 @Composable
 fun QuestionDisplay(question : Result,
+                    questionSize : Int,
                     questionIndex: MutableState<Int>,
-                    viewModel: QuestionsViewModel,
                     onNextClicked: (Int) -> Unit = {}
 ) {
 
@@ -132,7 +129,9 @@ fun QuestionDisplay(question : Result,
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start) {
 
-            QuestionTracker(counter = questionIndex.value)
+            if(questionIndex.value >=1) ShowProgress(score = questionIndex.value+1)
+
+            QuestionTracker(counter = questionIndex.value+1, questionSize )
             DrawDottedLine(pathEffect = pathEffect)
             
             Column {
@@ -208,7 +207,7 @@ fun QuestionDisplay(question : Result,
                         .padding(3.dp)
                         .align(alignment = Alignment.CenterHorizontally),
                     shape = RoundedCornerShape(34.dp),
-                    colors = ButtonDefaults.buttonColors(
+                    colors = buttonColors(
                         containerColor = AppColors._LightBlue
                     )
                 ) {
@@ -257,3 +256,62 @@ fun DrawDottedLine(pathEffect : androidx.compose.ui.graphics.PathEffect) {
     }
 }
 
+@Preview
+@Composable
+fun ShowProgress(score: Int = 12) {
+
+    val gradient = Brush.linearGradient(listOf(Color(0xFFF95075),
+        Color(0xFFBE6BE5)
+    ))
+
+    val progressFactor = remember(score) {
+        mutableStateOf(score*0.05f)
+    }
+
+    Row(modifier = Modifier
+        .padding(4.dp)
+        .fillMaxWidth()
+        .height(48.dp)
+        .border(
+            width = 4.dp,
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    AppColors._LightPurple, AppColors._LightPurple
+                )
+            ),
+            shape = RoundedCornerShape(32.dp)
+        )
+        .clip(
+            shape = RoundedCornerShape(
+                topStartPercent = 50,
+                topEndPercent = 50,
+                bottomEndPercent = 50,
+                bottomStartPercent = 50
+            )
+        )
+        .background(Color.Transparent),
+        verticalAlignment = Alignment.CenterVertically) {
+
+        Button(
+            contentPadding = PaddingValues(1.dp),
+            onClick = { },
+            modifier = Modifier
+                .fillMaxWidth(progressFactor.value)
+                .background(brush = gradient),
+            enabled = false,
+            elevation = null,
+            colors = buttonColors(
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            )) {
+            Text(text = (score*10).toString(),
+                modifier = Modifier.clip(shape = RoundedCornerShape(24.dp))
+                    .fillMaxHeight(0.87f)
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                color = AppColors._OffWhite,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
